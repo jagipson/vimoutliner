@@ -71,6 +71,8 @@ let s:loaded = 1
 function! InsertCheckBox()
 	let @x = "[_] "
 	normal! ^"xP
+  " collapse spaces to one space, add a space if none, add time stamp
+  substitute/ *$/\=strftime(" +%D %a %H:%M+")/e
 endfunction
 "}}}1
 " Safely InsertCheckBox() {{{1
@@ -83,6 +85,8 @@ function! SafelyInsertCheckBox()
 	if match(getline("."),"[\[X_\]]") == -1
 		let @x = "[_] "
 		normal! ^"xP
+    " collapse spaces to one space, add a space if none, add time stamp
+    substitute/ *$/\=strftime(" +%D %a %H:%M+")/e
 	endif
 endfunction
 "}}}1
@@ -98,9 +102,11 @@ function! SafelyInsertCheckBoxPercent()
 			let @x = "[_] % "
 		else
 			let @x = "[_] "
-		endif
-           normal! ^"xP
-        endif
+    endif
+    normal! ^"xP
+    " collapse spaces to one space, add a space if none, add time stamp
+    substitute/ *$/\=strftime(" +%D %a %H:%M+")/e
+  endif
 endfunction
 "}}}1
 " Safely InsertCheckBoxPercentAlways() {{{1
@@ -113,8 +119,10 @@ function! SafelyInsertCheckBoxPercentAlways()
 	endif
         if match(getline("."), "[\[X_\]]") == -1
 		let @x = "[_] % "
-           normal! ^"xP
-        endif
+    normal! ^"xP
+    " collapse spaces to one space, add a space if none, add time stamp
+    substitute/ *$/\=strftime(" +%D %a %H:%M+")/e
+  endif
 endfunction
 "}}}1
 " SwitchBox() {{{1
@@ -126,9 +134,15 @@ function! SwitchBox()
    if (questa != -1) || (questb != -1)
 	   if (questa != -1) 
 	      substitute/\[_\]/\[X\]/
+        " remove time stamp
+        substitute/-\(\d\{2\}[/ ]\)\{3\}\a\{3\} \(\d\{2\}[:-]\)\{2\}$//e
+        " collapse spaces to one space, add a space if none, add time stamp
+        substitute/ *$/\=strftime(" -%D %a %H:%M-")/e
 	      call SetPercent(".",100)
 	   else
 	      substitute/\[X\]/\[_\]/
+        " remove time stamp
+        substitute/-\(\d\{2\}[/ ]\)\{3\}\a\{3\} \(\d\{2\}[:-]\)\{2\}$//e
 	      call SetPercent(".",0)
 	   endif
    endif
@@ -145,6 +159,9 @@ function! DeleteCheckbox()
 	   else
 	      substitute/\(^\s*\)\[X\] \(.*\)/\1\2/
 	   endif
+     " remove time stamps
+     substitute/+\(\d\{2\}[/ ]\)\{3\}\a\{3\} \(\d\{2\}[:+]\)\{2\}//e
+     substitute/-\(\d\{2\}[/ ]\)\{3\}\a\{3\} \(\d\{2\}[:-]\)\{2\}$//e
    endif
 endfunction
 "}}}1
